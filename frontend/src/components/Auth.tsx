@@ -11,15 +11,26 @@ const Auth: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
 
   const handleSignUp = async () => {
-    const { data, error } = await supabase.auth.signUp({ email, password });
-    if (error) setError(error.message);
-    else console.log('User signed up:', data.user);
+    setError(null);
+    try {
+      const { data, error } = await supabase.auth.signUp({ email, password });
+      if (error) throw error;
+      console.log('User signed up:', data.user);
+    } catch (error: any) {
+      setError(error.message);
+    }
   };
 
   const handleSignIn = async () => {
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) setError(error.message);
-    else console.log('User signed in:', data.user);
+    setError(null);
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) throw error;
+      console.log('User signed in:', data.user);
+    } catch (error: any) {
+      console.error('Error signing in:', error);
+      setError(error.message);
+    }
   };
 
   return (
