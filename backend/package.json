@@ -1,0 +1,24 @@
+{
+  "name": "fullstack-web-app-backend",
+  "version": "1.0.0",
+  "description": "Backend for the full stack web application using Node.js, Express, and PostgreSQL.",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js",
+    "migrate": "knex migrate:latest --knexfile src/db/knexfile.js",
+    "rollback": "knex migrate:rollback --knexfile src/db/knexfile.js"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.48.1",
+    "dotenv": "^16.4.7",
+    "express": "^4.17.1",
+    "knex": "^0.95.0",
+    "pg": "^8.7.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.7"
+  },
+  "author": "Your Name",
+  "license": "MIT"
+}
