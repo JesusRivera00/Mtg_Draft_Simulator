@@ -1,4 +1,5 @@
 require('dotenv').config();
+const path = require('path');
 
 module.exports = {
   development: {
@@ -10,6 +11,7 @@ module.exports = {
       database: process.env.DB_NAME,
     },
     migrations: {
+      directory: path.join(__dirname, 'migrations'), 
       tableName: 'knex_migrations',
     },
   },
@@ -23,6 +25,7 @@ module.exports = {
       },
     },
     migrations: {
+      directory: path.join(__dirname, 'migrations'), 
       tableName: 'knex_migrations',
     },
   },
