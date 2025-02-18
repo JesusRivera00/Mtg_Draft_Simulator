@@ -22,9 +22,10 @@
 
 .amplified-card {
   display: none;
-  position: absolute;
-  top: -10px;
-  left: 110px;
+  position: fixed;
+  top: 50%; 
+  left: 50%; 
+  transform: translate(-50%, -50%); 
   z-index: 10;
 }
 
@@ -36,4 +37,83 @@
   max-width: 300px; 
   height: auto;
   border-radius: 8px; 
+}
+
+.deck {
+  margin-top: 20px;
+}
+
+.deck-card {
+  display: flex;
+  justify-content: space-between;
+  padding: 5px;
+  margin: 5px 0;
+  border-radius: 4px;
+  color: black;
+  font-weight: bold;
+  background-color: rgba(255, 255, 255, 0.8); /* Default background color with opacity */
+  position: relative;
+}
+
+.deck-card span {
+  text-shadow: 1px 1px 2px black; /* Add outline to text */
+}
+
+.deck-card.white {
+  background-color: rgba(255, 255, 255, 0.6); /* White */
+}
+
+.deck-card.blue {
+  background-color: rgba(0, 0, 255, 0.6); /* Blue */
+  color: white; 
+}
+
+.deck-card.black {
+  background-color: rgba(0, 0, 0, 0.6); /* Black */
+  color: white; 
+}
+
+.deck-card.red {
+  background-color: rgba(255, 0, 0, 0.6); /* Red */
+  color: white; 
+}
+
+.deck-card.green {
+  background-color: rgba(0, 128, 0, 0.6); /* Green */
+  color: white; 
+}
+
+.deck-card.gold {
+  background-color: rgba(255, 215, 0, 0.6); /* Gold */
+  color: black; 
+}
+
+.deck-card.gray {
+  background-color: rgba(128, 128, 128, 0.6); /* Gray */
+  color: white; 
+}
+
+.deck-card:hover .amplified-card {
+  display: block;
+}
+
+.deck-card .amplified-card {
+  display: none;
+  position: fixed; 
+  top: 50%; 
+  left: 50%; 
+  transform: translate(-50%, -50%); 
+  z-index: 10;
+}
+
+.deck-card .amplified-card img {
+  max-width: 300px;
+  height: auto;
+  border-radius: 8px;
+}
+
+.mana-symbol {
+  width: 20px; 
+  height: 20px; 
+  margin-left: 2px;
 }

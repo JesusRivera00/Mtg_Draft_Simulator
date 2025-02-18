@@ -14,6 +14,7 @@
     "@types/axios": "^0.9.36",
     "@types/react-router-dom": "^5.3.3",
     "axios": "^1.7.9",
+    "mana-font": "^1.18.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-router-dom": "^7.1.5"

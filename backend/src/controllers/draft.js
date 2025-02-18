@@ -1,8 +1,8 @@
 const axios = require('axios');
 
-const fetchPack = async (req, res) => {
+const fetchPacks = async (req, res) => {
   const { setName } = req.body;
-  console.log('Fetching pack for set:', setName); // Log the set name
+  console.log('Fetching packs for set:', setName); // Log the set name
   try {
     const response = await axios.get(`https://api.scryfall.com/sets/${setName}`);
     if (!response.data.search_uri) {
@@ -11,22 +11,35 @@ const fetchPack = async (req, res) => {
     const cardsResponse = await axios.get(response.data.search_uri);
     const cards = cardsResponse.data.data;
 
-    // Randomly select 1 rare or mythic, 3 uncommons, and 10 commons
-    const rares = cards.filter(card => card.rarity === 'rare' || card.rarity === 'mythic');
-    const uncommons = cards.filter(card => card.rarity === 'uncommon');
-    const commons = cards.filter(card => card.rarity === 'common');
+    // Function to create a pack
+    const createPack = () => {
+      const rares = cards.filter(card => card.rarity === 'rare' || card.rarity === 'mythic');
+      const uncommons = cards.filter(card => card.rarity === 'uncommon');
+      const commons = cards.filter(card => card.rarity === 'common');
 
-    const pack = [
-      ...rares.sort(() => 0.5 - Math.random()).slice(0, 1),
-      ...uncommons.sort(() => 0.5 - Math.random()).slice(0, 3),
-      ...commons.sort(() => 0.5 - Math.random()).slice(0, 10),
-    ];
+      return [
+        ...rares.sort(() => 0.5 - Math.random()).slice(0, 1),
+        ...uncommons.sort(() => 0.5 - Math.random()).slice(0, 3),
+        ...commons.sort(() => 0.5 - Math.random()).slice(0, 10),
+      ];
+    };
 
-    res.status(200).json({ pack });
+    // Create 8 packs
+    const packs = Array.from({ length: 8 }, createPack);
+
+    res.status(200).json({ packs });
   } catch (error) {
-    console.error('Error fetching pack:', error.message);
+    console.error('Error fetching packs:', error.message);
     res.status(500).json({ error: error.message });
   }
 };
 
-module.exports = { fetchPack };
+const draftBots = (pack) => {
+  // Select the card with the highest EDH rating
+  const selectedCard = pack.reduce((highestRatedCard, currentCard) => {
+    return currentCard.edhrec_rank < highestRatedCard.edhrec_rank ? currentCard : highestRatedCard;
+  });
+  return selectedCard;
+};
+
+module.exports = { fetchPacks, draftBots };
