@@ -33,12 +33,19 @@ const Draft: React.FC = () => {
       {message && <p>{message}</p>}
       <div className="pack">
         {pack.map(card => (
-          <img
-            key={card.id}
-            src={card.image_uris.normal}
-            alt={card.name}
-            className="card-image"
-          />
+          <div key={card.id} className="card-container">
+            <img
+              src={card.image_uris.normal}
+              alt={card.name}
+              className="card-image"
+            />
+            <div className="amplified-card">
+              <img
+                src={card.image_uris.normal}
+                alt={card.name}
+              />
+            </div>
+          </div>
         ))}
       </div>
     </div>

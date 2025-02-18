@@ -1,9 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { createClient } from '@supabase/supabase-js';
-
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string;
-const supabaseKey = import.meta.env.VITE_SUPABASE_KEY as string;
-const supabase = createClient(supabaseUrl, supabaseKey);
+import React, { useState } from 'react';
+import supabase from '../supabaseClient';
 
 interface AuthProps {
   mode: 'signup' | 'login';
@@ -17,7 +13,7 @@ const Auth: React.FC<AuthProps> = ({ mode }) => {
   const handleSignUp = async () => {
     setError(null);
     try {
-      const { data, error } = await supabase.auth.signUp({ email, password }, { redirectTo: window.location.origin });
+      const { data, error } = await supabase.auth.signUp({ email, password });
       if (error) throw error;
       console.log('User signed up:', data.user);
     } catch (error: any) {

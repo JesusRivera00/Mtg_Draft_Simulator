@@ -5,6 +5,10 @@
   gap: 10px;
 }
 
+.card-container {
+  position: relative;
+}
+
 .card-image {
   max-width: 100px; 
   height: auto;
@@ -14,4 +18,22 @@
 
 .card-image:hover {
   transform: scale(1.1);
+}
+
+.amplified-card {
+  display: none;
+  position: absolute;
+  top: -10px;
+  left: 110px;
+  z-index: 10;
+}
+
+.card-container:hover .amplified-card {
+  display: block;
+}
+
+.amplified-card img {
+  max-width: 300px; 
+  height: auto;
+  border-radius: 8px; 
 }

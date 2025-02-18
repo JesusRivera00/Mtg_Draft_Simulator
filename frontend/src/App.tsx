@@ -4,12 +4,8 @@ import Auth from './components/Auth';
 import Rooms from './components/Rooms';
 import Room from './components/Room';
 import Draft from './components/Draft';
-import { createClient } from '@supabase/supabase-js';
+import supabase from './supabaseClient';
 import './App.css';
-
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string;
-const supabaseKey = import.meta.env.VITE_SUPABASE_KEY as string;
-const supabase = createClient(supabaseUrl, supabaseKey);
 
 const App: React.FC = () => {
   const [user, setUser] = useState<any>(null);
@@ -27,7 +23,7 @@ const App: React.FC = () => {
     });
 
     return () => {
-      authListener?.unsubscribe();
+      authListener.subscription.unsubscribe();
     };
   }, []);
 
