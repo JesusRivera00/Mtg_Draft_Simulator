@@ -5,7 +5,11 @@ const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string;
 const supabaseKey = import.meta.env.VITE_SUPABASE_KEY as string;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-const Auth: React.FC = () => {
+interface AuthProps {
+  mode: 'signup' | 'login';
+}
+
+const Auth: React.FC<AuthProps> = ({ mode }) => {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
@@ -35,7 +39,7 @@ const Auth: React.FC = () => {
 
   return (
     <div>
-      <h2>Auth</h2>
+      <h2>{mode === 'signup' ? 'Sign Up' : 'Login'}</h2>
       <input
         type="email"
         placeholder="Email"
@@ -48,8 +52,11 @@ const Auth: React.FC = () => {
         value={password}
         onChange={(e) => setPassword(e.target.value)}
       />
-      <button onClick={handleSignUp}>Sign Up</button>
-      <button onClick={handleSignIn}>Sign In</button>
+      {mode === 'signup' ? (
+        <button onClick={handleSignUp}>Sign Up</button>
+      ) : (
+        <button onClick={handleSignIn}>Login</button>
+      )}
       {error && <p>{error}</p>}
     </div>
   );
