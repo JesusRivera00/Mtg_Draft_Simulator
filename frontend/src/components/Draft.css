@@ -1,0 +1,17 @@
+.pack {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+
+.card-image {
+  max-width: 100px; 
+  height: auto;
+  transition: transform 0.2s;
+  border-radius: 8px; 
+}
+
+.card-image:hover {
+  transform: scale(1.1);
+}

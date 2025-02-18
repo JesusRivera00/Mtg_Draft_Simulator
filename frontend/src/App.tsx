@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import Auth from './components/Auth';
 import Rooms from './components/Rooms';
 import Room from './components/Room';
+import Draft from './components/Draft';
 import { createClient } from '@supabase/supabase-js';
 import './App.css';
 
@@ -58,6 +59,7 @@ const App: React.FC = () => {
           <Route path="/login" element={<Auth mode="login" />} />
           <Route path="/rooms" element={<Rooms />} />
           <Route path="/room/:roomId" element={<Room />} />
+          <Route path="/draft" element={<Draft />} />
         </Routes>
       </div>
     </Router>

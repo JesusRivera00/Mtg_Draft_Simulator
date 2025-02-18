@@ -1,39 +1,53 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+
+interface Set {
+  code: string;
+  name: string;
+  set_type: string;
+}
 
 const Room: React.FC = () => {
-  const [setName, setSetName] = useState<string>('');
+  const [sets, setSets] = useState<Set[]>([]);
+  const [selectedSet, setSelectedSet] = useState<string>('');
   const [message, setMessage] = useState<string>('');
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchSets = async () => {
+      try {
+        const response = await axios.get('https://api.scryfall.com/sets');
+        const mainSets = response.data.data.filter((set: Set) =>
+          ['core', 'masters'].includes(set.set_type)
+        );
+        setSets(mainSets);
+      } catch (error) {
+        setMessage(`Error fetching sets: ${error.response?.data?.error || error.message}`);
+      }
+    };
+
+    fetchSets();
+  }, []);
 
   const handleFetchSet = async () => {
     try {
-      const response = await axios.get(`https://api.scryfall.com/sets/${setName}`);
-      const cardsResponse = await axios.get(response.data.search_uri);
-      const cards = cardsResponse.data.data;
-
-      // Save cards in batches
-      const batchSize = 20;
-      for (let i = 0; i < cards.length; i += batchSize) {
-        const batch = cards.slice(i, i + batchSize);
-        await axios.post('http://localhost:3000/api/cards', { cards: batch });
-      }
-
-      setMessage(`Fetched and saved ${cards.length} cards from set ${setName}`);
+      navigate('/draft', { state: { setName: selectedSet } });
     } catch (error) {
-      setMessage(`Error fetching set: ${(error as any).response.data}`);
+      setMessage(`Error starting draft: ${error.response?.data?.error || error.message}`);
     }
   };
 
   return (
     <div>
-      <h2>Enter Magic: The Gathering Set Name</h2>
-      <input
-        type="text"
-        placeholder="Set Name"
-        value={setName}
-        onChange={(e) => setSetName(e.target.value)}
-      />
-      <button onClick={handleFetchSet}>Fetch Set</button>
+      <h2>Select Magic: The Gathering Set</h2>
+      <select value={selectedSet} onChange={(e) => setSelectedSet(e.target.value)}>
+        <option value="">Select a set</option>
+        {sets.map(set => (
+          <option key={set.code} value={set.code}>{set.name}</option>
+        ))}
+      </select>
+      <button onClick={handleFetchSet} disabled={!selectedSet}>Start Draft</button>
       {message && <p>{message}</p>}
     </div>
   );
