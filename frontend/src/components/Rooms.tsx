@@ -1,15 +1,18 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const Rooms: React.FC = () => {
   const [roomName, setRoomName] = useState<string>('');
   const [roomId, setRoomId] = useState<string>('');
   const [message, setMessage] = useState<string>('');
+  const navigate = useNavigate();
 
   const handleCreateRoom = async () => {
     try {
       const response = await axios.post<{ roomId: string }>('http://localhost:3000/api/rooms', { name: roomName });
       setMessage(`Room created with ID: ${response.data.roomId}`);
+      navigate(`/room/${response.data.roomId}`);
     } catch (error) {
       setMessage(`Error creating room: ${(error as any).response.data}`);
     }
@@ -19,6 +22,7 @@ const Rooms: React.FC = () => {
     try {
       const response = await axios.post<{ room: { name: string } }>('http://localhost:3000/api/rooms/join', { roomId });
       setMessage(`Joined room: ${response.data.room.name}`);
+      navigate(`/room/${roomId}`);
     } catch (error) {
       setMessage(`Error joining room: ${(error as any).response.data}`);
     }

@@ -17,7 +17,7 @@ const Auth: React.FC<AuthProps> = ({ mode }) => {
   const handleSignUp = async () => {
     setError(null);
     try {
-      const { data, error } = await supabase.auth.signUp({ email, password });
+      const { data, error } = await supabase.auth.signUp({ email, password }, { redirectTo: window.location.origin });
       if (error) throw error;
       console.log('User signed up:', data.user);
     } catch (error: any) {

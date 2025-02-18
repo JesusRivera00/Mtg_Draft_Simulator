@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import Auth from './components/Auth';
 import Rooms from './components/Rooms';
+import Room from './components/Room';
 import './App.css';
 
 const App: React.FC = () => {
@@ -18,6 +19,7 @@ const App: React.FC = () => {
           <Route path="/signup" element={<Auth mode="signup" />} />
           <Route path="/login" element={<Auth mode="login" />} />
           <Route path="/rooms" element={<Rooms />} />
+          <Route path="/room/:roomId" element={<Room />} />
         </Routes>
       </div>
     </Router>
