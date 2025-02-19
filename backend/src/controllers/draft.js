@@ -24,8 +24,8 @@ const fetchPacks = async (req, res) => {
       ];
     };
 
-    // Create 8 packs
-    const packs = Array.from({ length: 8 }, createPack);
+    // Create 3 sets of 8 packs
+    const packs = Array.from({ length: 3 }, () => Array.from({ length: 8 }, createPack));
 
     res.status(200).json({ packs });
   } catch (error) {

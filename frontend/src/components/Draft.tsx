@@ -14,10 +14,12 @@ interface Card {
 const Draft: React.FC = () => {
   const location = useLocation();
   const { setName } = location.state as { setName: string };
-  const [packs, setPacks] = useState<Card[][]>([]);
+  const [packs, setPacks] = useState<Card[][][]>([]);
+  const [currentRound, setCurrentRound] = useState<number>(0);
   const [userPackIndex, setUserPackIndex] = useState<number>(0);
   const [deck, setDeck] = useState<Card[]>([]);
   const [message, setMessage] = useState<string>('');
+  const [deckList, setDeckList] = useState<string>('');
 
   useEffect(() => {
     const fetchPacks = async () => {
@@ -42,22 +44,39 @@ const Draft: React.FC = () => {
 
   const handleCardSelect = (selectedCard: Card) => {
     setDeck([...deck, selectedCard]);
-    const updatedPacks = packs.map((pack, index) => {
-      if (index === userPackIndex) {
-        return pack.filter(card => card.id !== selectedCard.id);
+    const updatedPacks = packs.map((round, roundIndex) => {
+      if (roundIndex === currentRound) {
+        return round.map((pack, packIndex) => {
+          if (packIndex === userPackIndex) {
+            return pack.filter(card => card.id !== selectedCard.id);
+          }
+          return pack;
+        });
       }
-      return pack;
+      return round;
     });
 
     // Simulate bots selecting cards
     for (let i = 0; i < 7; i++) {
       const botPackIndex = (userPackIndex + i + 1) % 8;
-      const botSelectedCard = draftBots(updatedPacks[botPackIndex]);
-      updatedPacks[botPackIndex] = updatedPacks[botPackIndex].filter(card => card.id !== botSelectedCard.id);
+      const botSelectedCard = draftBots(updatedPacks[currentRound][botPackIndex]);
+      updatedPacks[currentRound][botPackIndex] = updatedPacks[currentRound][botPackIndex].filter(card => card.id !== botSelectedCard.id);
     }
 
     setPacks(updatedPacks);
-    setUserPackIndex((userPackIndex + 1) % 8);
+
+    // Move to the next pack
+    if (currentRound % 2 === 0) {
+      setUserPackIndex((userPackIndex + 1) % 8);
+    } else {
+      setUserPackIndex((userPackIndex + 7) % 8); // Move counterclockwise
+    }
+
+    // Move to the next round if all packs are empty
+    if (updatedPacks[currentRound].every(pack => pack.length === 0)) {
+      setCurrentRound(currentRound + 1);
+      setUserPackIndex(0); // Reset to the first pack
+    }
   };
 
   const getColorClass = (colors: string[]) => {
@@ -95,12 +114,17 @@ const Draft: React.FC = () => {
 
   const sortedDeck = [...deck].sort((a, b) => parseManaValue(a.mana_cost) - parseManaValue(b.mana_cost));
 
+  const handleGenerateDeckList = () => {
+    const deckListText = deck.map(card => `1 ${card.name}`).join('\n');
+    setDeckList(deckListText);
+  };
+
   return (
     <div>
       <h2>Draft</h2>
       {message && <p>{message}</p>}
       <div className="pack">
-        {packs[userPackIndex]?.map((card, index) => (
+        {packs[currentRound]?.[userPackIndex]?.map((card, index) => (
           <div key={`${card.id}-${index}`} className="card-container" onClick={() => handleCardSelect(card)}>
             <img
               src={card.image_uris.normal}
@@ -131,6 +155,13 @@ const Draft: React.FC = () => {
           </div>
         ))}
       </div>
+      <button onClick={handleGenerateDeckList}>Generate Deck List</button>
+      {deckList && (
+        <div>
+          <h3>Deck List</h3>
+          <textarea value={deckList} readOnly rows={10} cols={50}></textarea>
+        </div>
+      )}
     </div>
   );
 };
