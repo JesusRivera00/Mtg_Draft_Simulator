@@ -16,6 +16,19 @@ interface Seat {
   seat_index: number;
 }
 
+interface CreateRoomResponse {
+  roomId: string;
+  seats: Seat[];
+}
+
+interface JoinRoomResponse {
+  seats: Seat[];
+}
+
+interface FetchSeatsResponse {
+  seats: Seat[];
+}
+
 const Room: React.FC = () => {
   const { roomId: paramRoomId } = useParams<{ roomId: string }>();
   const [roomId, setRoomId] = useState<string>(paramRoomId || '');
@@ -45,7 +58,7 @@ const Room: React.FC = () => {
 
   const handleCreateRoom = async () => {
     try {
-      const response = await axios.post<{ roomId: string; seats: Seat[] }>('http://localhost:3000/api/rooms', { name: roomName, userId });
+      const response = await axios.post<CreateRoomResponse>('http://localhost:3000/api/rooms', { name: roomName, userId });
       setMessage('Room created and joined successfully');
       setRoomId(response.data.roomId);
       setSeats(response.data.seats);
@@ -57,7 +70,7 @@ const Room: React.FC = () => {
 
   const handleJoinRoom = async () => {
     try {
-      const response = await axios.post<{ seats: Seat[] }>('http://localhost:3000/api/rooms/join', { roomId, userId });
+      const response = await axios.post<JoinRoomResponse>('http://localhost:3000/api/rooms/join', { roomId, userId });
       setMessage('Joined room successfully');
       setSeats(response.data.seats);
       navigate(`/room/${roomId}`);
@@ -83,7 +96,7 @@ const Room: React.FC = () => {
     if (roomId) {
       const fetchSeats = async () => {
         try {
-          const response = await axios.get<{ seats: Seat[] }>(`http://localhost:3000/api/rooms/${roomId}/seats`);
+          const response = await axios.get<FetchSeatsResponse>(`http://localhost:3000/api/rooms/${roomId}/seats`);
           setSeats(response.data.seats);
         } catch (error: any) {
           setMessage(`Error fetching seats: ${error.response?.data?.error || error.message}`);
