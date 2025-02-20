@@ -122,7 +122,7 @@ const Room: React.FC = () => {
           (payload) => {
             console.log('Player updated!', payload);
             setSeats((prevSeats) =>
-              prevSeats.map((seat) => (seat.id === payload.new.id ? (payload.new as Seat) : seat))
+              prevSeats.map((seat) => (seat.id === payload.new.id ? payload.new as Seat : seat))
             );
           }
         )

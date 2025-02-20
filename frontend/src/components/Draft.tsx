@@ -22,7 +22,7 @@ interface DraftState {
 
 const Draft: React.FC = () => {
   const location = useLocation();
-  const { setName, roomId } = location.state as { setName: string, roomId: number };
+  const { roomId } = location.state as { roomId: number };
   const userId = localStorage.getItem('userId');
   const [packs, setPacks] = useState<Card[][][]>([]);
   const [currentRound, setCurrentRound] = useState<number>(0);
