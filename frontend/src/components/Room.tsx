@@ -24,7 +24,7 @@ interface CreateRoomResponse {
 interface JoinRoomResponse {
   seats: Seat[];
 }
-
+  
 interface FetchSeatsResponse {
   seats: Seat[];
 }
@@ -44,8 +44,8 @@ const Room: React.FC = () => {
     const fetchSets = async () => {
       try {
         const response = await axios.get('https://api.scryfall.com/sets');
-        const mainSets = response.data.data.filter((set: Set) =>
-          ['core', 'masters'].includes(set.set_type)
+        const mainSets = (response.data as { data: Set[] }).data.filter((set: Set) =>
+          ['core', 'masters', 'expansion'].includes(set.set_type)
         );
         setSets(mainSets);
       } catch (error: any) {
