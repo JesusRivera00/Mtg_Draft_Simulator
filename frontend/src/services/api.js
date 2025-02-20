@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'https://fullstack-web-app-backend.onrender.com/api', 
+  baseURL: '/api', 
 });
 
 // Example function to get data from the backend
