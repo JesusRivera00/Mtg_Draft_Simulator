@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import supabase from '../supabaseClient';
+import './Auth.css';
 
 interface AuthProps {
   mode: 'signup' | 'login';
@@ -34,26 +35,28 @@ const Auth: React.FC<AuthProps> = ({ mode }) => {
   };
 
   return (
-    <div>
-      <h2>{mode === 'signup' ? 'Sign Up' : 'Login'}</h2>
-      <input
-        type="email"
-        placeholder="Email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-      />
-      <input
-        type="password"
-        placeholder="Password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-      />
-      {mode === 'signup' ? (
-        <button onClick={handleSignUp}>Sign Up</button>
-      ) : (
-        <button onClick={handleSignIn}>Login</button>
-      )}
-      {error && <p>{error}</p>}
+    <div className="auth-container">
+      <div className="auth-box">
+        <h2>{mode === 'signup' ? 'Sign Up' : 'Login'}</h2>
+        <input
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+        {mode === 'signup' ? (
+          <button onClick={handleSignUp}>Sign Up</button>
+        ) : (
+          <button onClick={handleSignIn}>Login</button>
+        )}
+        {error && <p>{error}</p>}
+      </div>
     </div>
   );
 };

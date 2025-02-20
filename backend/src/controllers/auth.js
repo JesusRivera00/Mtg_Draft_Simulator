@@ -13,7 +13,7 @@ const signUp = async (req, res) => {
     return res.status(400).json({ error: error.message });
   }
 
-  res.status(200).json({ user });
+  res.status(200).json({ userId: user.id });
 };
 
 const signIn = async (req, res) => {
@@ -24,7 +24,7 @@ const signIn = async (req, res) => {
     return res.status(400).json({ error: error.message });
   }
 
-  res.status(200).json({ user });
+  res.status(200).json({ userId: user.id });
 };
 
 module.exports = { signUp, signIn };

@@ -5,6 +5,22 @@
   text-align: center;
 }
 
+nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+nav button {
+  margin-left: 1rem;
+}
+
+h1 {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+}
+
 .logo {
   height: 6em;
   padding: 1.5em;

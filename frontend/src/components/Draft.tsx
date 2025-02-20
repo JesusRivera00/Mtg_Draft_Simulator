@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
+import supabase from '../supabaseClient';
 import './Draft.css'; 
+
 interface Card {
   id: string;
   name: string;
@@ -13,36 +15,68 @@ interface Card {
 
 const Draft: React.FC = () => {
   const location = useLocation();
-  const { setName } = location.state as { setName: string };
+  const navigate = useNavigate();
+  const { setName, roomId } = location.state as { setName: string, roomId: number };
+  const userId = localStorage.getItem('userId');
   const [packs, setPacks] = useState<Card[][][]>([]);
   const [currentRound, setCurrentRound] = useState<number>(0);
   const [userPackIndex, setUserPackIndex] = useState<number>(0);
   const [deck, setDeck] = useState<Card[]>([]);
   const [message, setMessage] = useState<string>('');
   const [deckList, setDeckList] = useState<string>('');
+  const [picks, setPicks] = useState<{ [key: string]: boolean }>({});
 
   useEffect(() => {
-    const fetchPacks = async () => {
+    const fetchDraftState = async () => {
       try {
-        const response = await axios.post('http://localhost:3000/api/draft/packs', { setName });
-        setPacks(response.data.packs);
+        console.log(`Fetching draft state for room ${roomId}`);
+        const response = await axios.get(`http://localhost:3000/api/draft/state/${roomId}`);
+        if (response.data) {
+          setPacks(response.data.packs || []);
+          setPicks(response.data.picks || {});
+          setCurrentRound(response.data.current_round);
+          setUserPackIndex(response.data.user_pack_index);
+          console.log(`Draft state fetched for room ${roomId}`);
+        } else {
+          setMessage('Draft state not found');
+        }
       } catch (error) {
-        setMessage(`Error fetching packs: ${error.response?.data?.error || error.message}`);
+        setMessage(`Error fetching draft state: ${error.response?.data?.error || error.message}`);
       }
     };
 
-    fetchPacks();
-  }, [setName]);
+    fetchDraftState();
+  }, [roomId]);
+
+  useEffect(() => {
+    const channel = supabase
+      .channel('draft-changes')
+      .on(
+        'postgres_changes',
+        { event: 'UPDATE', schema: 'public', table: 'draft_state', filter: `room_id=eq.${roomId}` },
+        (payload) => {
+          console.log('Draft state change received!', payload);
+          setPacks(payload.new.packs || []);
+          setPicks(payload.new.picks || {});
+          setCurrentRound(payload.new.current_round);
+          setUserPackIndex(payload.new.user_pack_index);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [roomId]);
 
   const draftBots = (pack: Card[]) => {
-    // Select the card with the highest rating
     const selectedCard = pack.reduce((highestRatedCard, currentCard) => {
       return currentCard.edhrec_rank < highestRatedCard.edhrec_rank ? currentCard : highestRatedCard;
     });
     return selectedCard;
   };
 
-  const handleCardSelect = (selectedCard: Card) => {
+  const handleCardSelect = async (selectedCard: Card) => {
     setDeck([...deck, selectedCard]);
     const updatedPacks = packs.map((round, roundIndex) => {
       if (roundIndex === currentRound) {
@@ -56,26 +90,34 @@ const Draft: React.FC = () => {
       return round;
     });
 
-    // Simulate bots selecting cards
-    for (let i = 0; i < 7; i++) {
-      const botPackIndex = (userPackIndex + i + 1) % 8;
-      const botSelectedCard = draftBots(updatedPacks[currentRound][botPackIndex]);
-      updatedPacks[currentRound][botPackIndex] = updatedPacks[currentRound][botPackIndex].filter(card => card.id !== botSelectedCard.id);
-    }
-
     setPacks(updatedPacks);
+    setPicks({ ...picks, [userId!]: true });
 
-    // Move to the next pack
-    if (currentRound % 2 === 0) {
-      setUserPackIndex((userPackIndex + 1) % 8);
-    } else {
-      setUserPackIndex((userPackIndex + 7) % 8); // Move counterclockwise
-    }
+    // Wait for all users to make their picks
+    const allPicksMade = Object.values(picks).every(pick => pick);
+    if (allPicksMade) {
+      for (let i = 0; i < 7; i++) {
+        const botPackIndex = (userPackIndex + i + 1) % 8;
+        const botSelectedCard = draftBots(updatedPacks[currentRound][botPackIndex]);
+        updatedPacks[currentRound][botPackIndex] = updatedPacks[currentRound][botPackIndex].filter(card => card.id !== botSelectedCard.id);
+      }
 
-    // Move to the next round if all packs are empty
-    if (updatedPacks[currentRound].every(pack => pack.length === 0)) {
-      setCurrentRound(currentRound + 1);
-      setUserPackIndex(0); // Reset to the first pack
+      setPacks(updatedPacks);
+      setPicks({});
+
+      if (currentRound % 2 === 0) {
+        setUserPackIndex((userPackIndex + 1) % 8);
+      } else {
+        setUserPackIndex((userPackIndex + 7) % 8);
+      }
+
+      if (updatedPacks[currentRound].every(pack => pack.length === 0)) {
+        setCurrentRound(currentRound + 1);
+        setUserPackIndex(0);
+      }
+
+      // Update the draft state in the database
+      await axios.post(`http://localhost:3000/api/draft/state/${roomId}`, { packs: updatedPacks, picks: {} });
     }
   };
 
@@ -91,7 +133,7 @@ const Draft: React.FC = () => {
         default: return 'gray';
       }
     }
-    return 'gold'; // Multicolored
+    return 'gold';
   };
 
   const convertManaCostToSymbols = (manaCost: string) => {

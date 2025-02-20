@@ -2,7 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const knex = require('knex');
-const knexConfig = require('./db/knexfile');
+const knexConfig = require('../knexfile'); 
 const routes = require('./routes/index');
 
 const app = express();

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import Auth from './components/Auth';
-import Rooms from './components/Rooms';
 import Room from './components/Room';
 import Draft from './components/Draft';
 import supabase from './supabaseClient';
@@ -48,13 +47,13 @@ const App: React.FC = () => {
               <button onClick={handleLogout}>Logout</button>
             </div>
           )}
-          <Link to="/rooms"><button>Rooms</button></Link>
+          <Link to="/room"><button>Room</button></Link>
         </nav>
         <Routes>
           <Route path="/signup" element={<Auth mode="signup" />} />
           <Route path="/login" element={<Auth mode="login" />} />
-          <Route path="/rooms" element={<Rooms />} />
-          <Route path="/room/:roomId" element={<Room />} />
+          <Route path="/room" element={<Room />} />
+          <Route path="/room/:roomId" element={<Room />} /> {/* Add this line */}
           <Route path="/draft" element={<Draft />} />
         </Routes>
       </div>
