@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import supabase from '../supabaseClient';
 import './Draft.css'; 
 
@@ -13,9 +13,15 @@ interface Card {
   colors: string[];
 }
 
+interface DraftState {
+  packs: Card[][][];
+  picks: { [key: string]: boolean };
+  current_round: number;
+  user_pack_index: number;
+}
+
 const Draft: React.FC = () => {
   const location = useLocation();
-  const navigate = useNavigate();
   const { setName, roomId } = location.state as { setName: string, roomId: number };
   const userId = localStorage.getItem('userId');
   const [packs, setPacks] = useState<Card[][][]>([]);
@@ -30,7 +36,7 @@ const Draft: React.FC = () => {
     const fetchDraftState = async () => {
       try {
         console.log(`Fetching draft state for room ${roomId}`);
-        const response = await axios.get(`http://localhost:3000/api/draft/state/${roomId}`);
+        const response = await axios.get<DraftState>(`http://localhost:3000/api/draft/state/${roomId}`);
         if (response.data) {
           setPacks(response.data.packs || []);
           setPicks(response.data.picks || {});
@@ -40,7 +46,7 @@ const Draft: React.FC = () => {
         } else {
           setMessage('Draft state not found');
         }
-      } catch (error) {
+      } catch (error: any) {
         setMessage(`Error fetching draft state: ${error.response?.data?.error || error.message}`);
       }
     };

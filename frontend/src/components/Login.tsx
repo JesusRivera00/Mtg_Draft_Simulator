@@ -11,11 +11,11 @@ const Login: React.FC = () => {
 
   const handleLogin = async () => {
     try {
-      const response = await axios.post('http://localhost:3000/api/signin', { email, password });
+      const response = await axios.post<{ userId: string }>('http://localhost:3000/api/signin', { email, password });
       const userId = response.data.userId;
       localStorage.setItem('userId', userId); // Save userId to localStorage
       navigate('/rooms');
-    } catch (error) {
+    } catch (error: any) {
       setMessage(`Error logging in: ${error.response?.data?.error || error.message}`);
     }
   };

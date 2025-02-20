@@ -24,7 +24,7 @@ const Room: React.FC = () => {
   const [roomName, setRoomName] = useState<string>('');
   const [message, setMessage] = useState<string>('');
   const [seats, setSeats] = useState<Seat[]>([]);
-  const [userId, setUserId] = useState(localStorage.getItem('userId') || '');
+  const userId = localStorage.getItem('userId');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -35,7 +35,7 @@ const Room: React.FC = () => {
           ['core', 'masters'].includes(set.set_type)
         );
         setSets(mainSets);
-      } catch (error) {
+      } catch (error: any) {
         setMessage(`Error fetching sets: ${error.response?.data?.error || error.message}`);
       }
     };
@@ -45,12 +45,12 @@ const Room: React.FC = () => {
 
   const handleCreateRoom = async () => {
     try {
-      const response = await axios.post<{ roomId: string }>('http://localhost:3000/api/rooms', { name: roomName, userId });
+      const response = await axios.post<{ roomId: string; seats: Seat[] }>('http://localhost:3000/api/rooms', { name: roomName, userId });
       setMessage('Room created and joined successfully');
       setRoomId(response.data.roomId);
       setSeats(response.data.seats);
       navigate(`/room/${response.data.roomId}`);
-    } catch (error) {
+    } catch (error: any) {
       setMessage(`Error creating room: ${error.response?.data?.error || error.message}`);
     }
   };
@@ -61,7 +61,7 @@ const Room: React.FC = () => {
       setMessage('Joined room successfully');
       setSeats(response.data.seats);
       navigate(`/room/${roomId}`);
-    } catch (error) {
+    } catch (error: any) {
       setMessage(`Error joining room: ${error.response?.data?.error || error.message}`);
     }
   };
@@ -73,7 +73,7 @@ const Room: React.FC = () => {
       console.log('Draft start response:', response.data);
       console.log(`Draft started for room ${roomId}`);
       navigate('/draft', { state: { setName: selectedSet, roomId } });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error starting draft:', error);
       setMessage(`Error starting draft: ${error.response?.data?.error || error.message}`);
     }
@@ -85,7 +85,7 @@ const Room: React.FC = () => {
         try {
           const response = await axios.get<{ seats: Seat[] }>(`http://localhost:3000/api/rooms/${roomId}/seats`);
           setSeats(response.data.seats);
-        } catch (error) {
+        } catch (error: any) {
           setMessage(`Error fetching seats: ${error.response?.data?.error || error.message}`);
         }
       };
@@ -113,7 +113,7 @@ const Room: React.FC = () => {
           { event: 'INSERT', schema: 'public', table: 'room_players', filter: `room_id=eq.${roomId}` },
           (payload) => {
             console.log('Player joined!', payload);
-            setSeats((prevSeats) => [...prevSeats, payload.new]);
+            setSeats((prevSeats) => [...prevSeats, payload.new as Seat]);
           }
         )
         .on(
@@ -122,7 +122,7 @@ const Room: React.FC = () => {
           (payload) => {
             console.log('Player updated!', payload);
             setSeats((prevSeats) =>
-              prevSeats.map((seat) => (seat.id === payload.new.id ? payload.new : seat))
+              prevSeats.map((seat) => (seat.id === payload.new.id ? (payload.new as Seat) : seat))
             );
           }
         )

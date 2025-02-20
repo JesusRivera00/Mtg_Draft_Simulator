@@ -10,11 +10,11 @@ const Signup: React.FC = () => {
 
   const handleSignup = async () => {
     try {
-      const response = await axios.post('http://localhost:3000/api/signup', { email, password });
+      const response = await axios.post<{ userId: string }>('http://localhost:3000/api/signup', { email, password });
       const userId = response.data.userId;
       localStorage.setItem('userId', userId); // Save userId to localStorage
       navigate('/rooms');
-    } catch (error) {
+    } catch (error: any) {
       setMessage(`Error signing up: ${error.response?.data?.error || error.message}`);
     }
   };
