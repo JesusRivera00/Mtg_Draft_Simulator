@@ -88,8 +88,8 @@ const handleDraftPick = async (req, res) => {
 
     // Update the draft state in the database
     await db('draft_state').where({ room_id: roomId }).update({
-      packs: JSON.stringify(updatedPacks), // Serialize packs to JSON string
-      picks: JSON.stringify(draftState.picks), // Serialize picks to JSON string
+      packs: JSON.stringify(updatedPacks), 
+      picks: JSON.stringify(draftState.picks), 
       current_round: draftState.current_round,
       user_pack_index: draftState.user_pack_index
     });
@@ -126,8 +126,6 @@ const getDraftState = async (req, res) => {
       return res.status(404).json({ error: 'Draft state not found' });
     }
     console.log(`Draft state before parsing:`, draftState);
-    // draftState.packs = JSON.parse(draftState.packs);
-    // draftState.picks = JSON.parse(draftState.picks);
     console.log(`Draft state fetched for room ${roomId}`);
     return res.status(200).json(draftState);
   } catch (error) {

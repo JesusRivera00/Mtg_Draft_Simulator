@@ -19,7 +19,10 @@ app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ extended: true, limit: '50mb' }));
 
 // Database connection
-const db = knex(knexConfig.development);
+const db = knex({
+  client: 'pg',
+  connection: process.env.SUPABASE_DB_URL,
+});
 
 // Routes
 app.use('/api', routes);
